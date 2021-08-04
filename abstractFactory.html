@@ -1,0 +1,73 @@
+<!--
+ * @Author: 李聪
+ * @Date: 2021-06-16 14:18:32
+ * @LastEditors: 李聪
+ * @LastEditTime: 2021-06-17 10:13:58
+ * @Description: 
+-->
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <script>
+      class Storage {
+        setItem(key, value) {
+          return localStorage.setItem(key, value);
+        }
+        getItem(key) {
+          return localStorage.getItem(key);
+        }
+
+        // 静态方法版
+        static getInstance() {
+          // 判断是否已经new过1个实例
+          if (!Storage.instance) {
+            // 若这个唯一的实例不存在，那么先创建它
+            Storage.instance = new Storage();
+          }
+          // 如果这个唯一的实例已经存在，则直接返回
+          return Storage.instance;
+        }
+
+        // 闭包版
+        // static getInstance = (function () {
+        //   let instance = null;
+        //   return function () {
+        //     if (!instance) {
+        //       instance = new Storage();
+        //     }
+        //     return instance;
+        //   };
+        // })();
+
+        //构造函数版
+        // constructor() {
+        //   if (!Storage.instance) {
+        //     Storage.instance = this;
+        //   }
+        //   return Storage.instance;
+        // }
+      }
+
+      // 静态方法版
+      // 闭包版
+      const storage1 = Storage.getInstance();
+      const storage2 = Storage.getInstance();
+
+      //构造函数版
+      // const storage1 = new Storage();
+      // const storage2 = new Storage();
+
+      storage1.setItem('name', 'li');
+      console.log(storage1.getItem('name'));
+      console.log(storage2.getItem('name'));
+      console.log(storage1 === storage2);
+    </script>
+  </body>
+</html>

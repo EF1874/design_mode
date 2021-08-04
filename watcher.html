@@ -1,0 +1,127 @@
+<!--
+ * @Author: 李聪
+ * @Date: 2021-08-03 11:49:23
+ * @LastEditors: 李聪
+ * @LastEditTime: 2021-08-04 13:51:02
+ * @Description: 观察者模式
+-->
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <script>
+      // 定义发布者基础类
+      class Publisher {
+        constructor() {
+          // 初始化订阅者
+          this.observers = [];
+          console.log('Publisher created');
+        }
+
+        add(observer) {
+          console.log('Publisher.add invoked');
+          this.observers.push(observer);
+        }
+
+        remove(observer) {
+          console.log('Publisher.remove invoked');
+          const newObservers = this.observers.filter((item, index) => {
+            // console.log('forEach', this.observers, item, index, observer, item !== observer);
+            return item !== observer;
+          });
+          this.observers = newObservers;
+          console.log(this.observers);
+        }
+
+        notify() {
+          console.log('Publisher.notify invoked');
+          this.observers.forEach(observer => {
+            observer.update(this);
+          });
+        }
+      }
+
+      // 定义订阅者基础类
+      class Observer {
+        constructor() {
+          console.log('Observer created');
+        }
+
+        update() {
+          console.log('Observer.update invoked');
+        }
+      }
+
+      // 定义一个具体的需求文档（prd）发布类
+      class PrdPublisher extends Publisher {
+        constructor() {
+          super();
+          // 初始化需求文档
+          this.prdState = null;
+          // 韩梅梅还没有拉群，开发群目前为空
+          this.observers = [];
+          console.log('PrdPublisher created');
+        }
+
+        getState() {
+          console.log('PrdPublisher.getState invoked');
+          return this.prdState;
+        }
+
+        setState(state) {
+          console.log('PrdPublisher.setState invoked');
+          this.prdState = state;
+          this.notify();
+        }
+      }
+
+      // 定义一个具体的接收需求文档（prd）的 订阅者类
+      class DeveloperObserver extends Observer {
+        constructor() {
+          super();
+          // 初始化接收的需求文档
+          this.prdState = {};
+
+          console.log('DeveloperObserver created');
+        }
+
+        // 重写一个具体update方法
+        update(publisher) {
+          console.log('DeveloperObserver.updata invoked');
+          // 更新文档
+          this.prdState = publisher.getState();
+          // 开始工作
+          this.work();
+        }
+
+        // work专门搬砖的方法
+        work() {
+          // 获取需求文档
+          const prd = this.prdState;
+
+          console.log('DeveloperObserver.work invoked');
+        }
+      }
+
+      const lilei = new DeveloperObserver();
+      const zs = new DeveloperObserver();
+      const ls = new DeveloperObserver();
+      const hanmeimei = new PrdPublisher();
+      const prd = {
+        todo: 'changePrd'
+      };
+
+      hanmeimei.add(lilei);
+      hanmeimei.add(zs);
+      hanmeimei.add(ls);
+      hanmeimei.setState(prd);
+      hanmeimei.remove(zs);
+    </script>
+  </body>
+</html>

@@ -1,0 +1,134 @@
+<!--
+ * @Author: 李聪
+ * @Date: 2021-07-29 10:11:41
+ * @LastEditors: 李聪
+ * @LastEditTime: 2021-07-29 14:00:12
+ * @Description: 装饰器模式
+-->
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>按钮点击需求1.0</title>
+  </head>
+  <style>
+    #modal {
+      height: 200px;
+      width: 200px;
+      line-height: 200px;
+      position: fixed;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      border: 1px solid black;
+      text-align: center;
+    }
+  </style>
+
+  <body>
+    <button id="open">点击打开</button>
+    <button id="close">关闭弹框</button>
+  </body>
+  <script>
+    // 弹框创建逻辑，这里我们复用了单例模式面试题的例子
+    const Modal = (function () {
+      let modal = null;
+      return function () {
+        if (!modal) {
+          modal = document.createElement("div");
+          modal.innerHTML = "您还未登录哦~";
+          modal.id = "modal";
+          modal.style.display = "none";
+          document.body.appendChild(modal);
+        }
+        return modal;
+      };
+    })();
+
+    // // ES5
+    // // 新版本将展示Modal的逻辑单独封装
+    // function openModal() {
+    //   const modal = new Modal()
+    //   modal.style.display = 'block'
+    // }
+
+    // // 新版本按钮文案修改逻辑
+    // function changeButtonText() {
+    //   const btn = document.getElementById('open')
+    //   btn.innerText = '快去登录'
+    // }
+
+    // // 新版本按钮置灰逻辑
+    // function disableButton() {
+    //   const btn = document.getElementById('open')
+    //   btn.setAttribute("disabled", true)
+    // }
+
+    // // 新版本功能逻辑整合
+    // function changeButtonStatus() {
+    //   changeButtonText()
+    //   disableButton()
+    // }
+
+    // ES6新版本 定义打开按钮
+    class OpenButton {
+      // 点击后展示弹框（旧逻辑）
+      onClick() {
+        const modal = new Modal();
+        modal.style.display = "block";
+      }
+    }
+
+    // ES6新版本  定义按钮对应的装饰器
+    class Decorator {
+      constructor(openBtn) {
+        this.openBtn = openBtn;
+      }
+
+      onClick() {
+        this.openBtn.onClick();
+        this.changeBtnStatus();
+      }
+
+      changeBtnStatus() {
+        this.changeBtnTxt();
+        this.disableBtn();
+      }
+
+      changeBtnTxt() {
+        const btn = document.querySelector("#open");
+        btn.innerText = "快去登录";
+      }
+
+      disableBtn() {
+        const btn = document.querySelector("#open");
+        btn.setAttribute("disabled", true);
+      }
+    }
+
+    const openBtn = new OpenButton();
+    const decorator = new Decorator(openBtn);
+
+    // 点击打开按钮展示模态框
+    document.getElementById("open").addEventListener("click", function () {
+      // // 未点击则不创建modal实例，避免不必要的内存占用
+      // // const modal = new Modal()
+      // // modal.style.display = 'block'
+
+      // // 新逻辑
+      // openModal()
+      // changeButtonStatus()
+
+      // ES6新逻辑
+      decorator.onClick();
+    });
+
+    // 点击关闭按钮隐藏模态框
+    document.getElementById("close").addEventListener("click", function () {
+      const modal = document.getElementById("modal");
+      if (modal) {
+        modal.style.display = "none";
+      }
+    });
+  </script>
+</html>

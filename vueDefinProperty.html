@@ -1,0 +1,100 @@
+<!--
+ * @Author: 李聪
+ * @Date: 2021-08-04 13:50:22
+ * @LastEditors: 李聪
+ * @LastEditTime: 2021-08-04 13:51:03
+ * @Description: vue双向绑定
+-->
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <script>
+      // Vue双向绑定原理
+      // observe方法遍历并包装对象属性
+      function observe(target) {
+        if (target && typeof target === 'object') {
+          Object.keys(target).forEach(key => {
+            // 给属性安装监视器
+            defineReactive(target, key, target[key]);
+          });
+        }
+      }
+
+      // 定义defineReactive方法
+      function defineReactive(target, key, val) {
+        observe(val);
+
+        Object.defineProperty(target, key, {
+          enumerable: true,
+          // 不可配置
+          configurable: false,
+          get() {
+            return val;
+          },
+          // 监听器函数
+          set(value) {
+            console.log(`${target}属性的${key}属性从${val}值变成了了${value}`);
+            val = value;
+          }
+        });
+      }
+
+      // 发布类
+      class Dep {
+        constructor() {
+          // 初始化订阅列队
+          this.sub = [];
+        }
+
+        // 添加订阅者
+        addSub(sub) {
+          this.sub.push(sub);
+        }
+
+        // 通知订阅者
+        notify(val) {
+          this.sub.forEach(sub => {
+            sub.update(val);
+          });
+        }
+      }
+
+      // 改写 defineReactive 中的 setter 方法，在监听器里去通知订阅者了：
+      function defineReactive(target, key, val) {
+        const watcher = new Watcher();
+        const dep = new Dep();
+        dep.addSub(watcher);
+        observe(val);
+        Object.defineProperty(target, key, {
+          set(value) {
+            dep.notify(value);
+          }
+        });
+      }
+
+      // 订阅者
+      class Watcher {
+        constructor() {
+          this.val = null;
+        }
+
+        update(observe) {
+          this.val = observe.get();
+          console.log('val is updated');
+          this.work();
+        }
+
+        work() {
+          console.log('working 996');
+        }
+      }
+    </script>
+  </body>
+</html>
